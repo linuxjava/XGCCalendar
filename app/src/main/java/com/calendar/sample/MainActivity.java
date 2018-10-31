@@ -34,13 +34,37 @@ public class MainActivity extends AppCompatActivity implements DatePickerControl
     }
 
     @Override
-    public void onDayOfMonthSelected(int year, int month, int day) {
-        Log.e("xiao1", day + " / " + month + " / " + year);
+    public void onDayOfMonthSelected(int year, int month, int day, int weekIndex) {
+        String weekStr = "";
+        switch (weekIndex) {
+            case 1:
+                weekStr = "星期日";
+                break;
+            case 2:
+                weekStr = "星期一";
+                break;
+            case 3:
+                weekStr = "星期二";
+                break;
+            case 4:
+                weekStr = "星期三";
+                break;
+            case 5:
+                weekStr = "星期四";
+                break;
+            case 6:
+                weekStr = "星期五";
+                break;
+            case 7:
+                weekStr = "星期六";
+                break;
+        }
+
+        Log.e("xiao1", day + " / " + month + " / " + year + " / " + weekStr);
     }
 
     @Override
     public void onDateRangeSelected(SimpleMonthAdapter.SelectedDays<SimpleMonthAdapter.CalendarDay> selectedDays) {
-
         Log.e("xiao1", selectedDays.getFirst().toString() + " --> " + selectedDays.getLast().toString());
     }
 }

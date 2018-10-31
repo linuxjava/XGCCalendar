@@ -111,6 +111,22 @@ public class CalendarUtils {
         return weekIndex == Calendar.SUNDAY || weekIndex == Calendar.SATURDAY;
     }
 
+    /**
+     * 判断当前日期是星期几
+     *
+     * @param year
+     * @param month 0到11
+     * @param day
+     * @return 1=SUNDAY, 2=MONDAY, 3=TUESDAY, 4=WEDNESDAY, 5=THURSDAY, 6=FRIDAY, 7=SATURDAY
+     */
+    public static int dayToWeek(int year, int month, int day) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+        return calendar.get(Calendar.DAY_OF_WEEK);
+    }
+
     public static int dp2px(Context context, float dpVal) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 dpVal, context.getResources().getDisplayMetrics());

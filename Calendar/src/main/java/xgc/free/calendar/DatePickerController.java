@@ -40,8 +40,9 @@ public interface DatePickerController {
      * @param year
      * @param month 0到11
      * @param day
+     * @param weekIndex 1=SUNDAY, 2=MONDAY, 3=TUESDAY, 4=WEDNESDAY, 5=THURSDAY, 6=FRIDAY, 7=SATURDAY
      */
-    void onDayOfMonthSelected(int year, int month, int day);
+    void onDayOfMonthSelected(int year, int month, int day, int weekIndex);
 
     /**
      * 多选日期

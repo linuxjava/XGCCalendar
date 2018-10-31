@@ -20,13 +20,17 @@
 package xgc.free.calendar;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AbsListView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.io.Serializable;
 import java.util.Calendar;
@@ -39,20 +43,30 @@ public class SimpleMonthAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public static final int ITEM_TYPE_MONTH = 1;
     private final TypedArray typedArray;
     private final Context mContext;
-    private DatePickerController mController;
+    private DatePickerController controller;
     private final Calendar calendar;
     private final SelectedDays<CalendarDay> selectedDays;
     private int startYear, startMonth;//开始年月年月，注startMonth释从0开始的
     private int selectWay = 1;//默认多选
-    private int mDefaultSelectedYear = -1;
-    private int mDefaultSelectedMonth = -1;
-    private int mDefaultSelectedDay = -1;
+    private int defaultSelectedYear = -1;
+    private int defaultSelectedMonth = -1;
+    private int defaultSelectedDay = -1;
+    private int weekHeight;
+    private int weekBgColor;
+    private int weekTextColor;
+    private int weekTextSize;
 
     public SimpleMonthAdapter(Context context, TypedArray typedArray) {
         this.typedArray = typedArray;
         calendar = Calendar.getInstance();
         selectedDays = new SelectedDays<>();
         mContext = context;
+
+        Resources resources = context.getResources();
+        weekHeight = typedArray.getDimensionPixelSize(R.styleable.DatePickerView_topWeekHeight, resources.getDimensionPixelSize(R.dimen.week_height));
+        weekTextSize = typedArray.getDimensionPixelSize(R.styleable.DatePickerView_topWeekTextSize, resources.getDimensionPixelSize(R.dimen.week_text_size));
+        weekBgColor = typedArray.getColor(R.styleable.DatePickerView_topWeekBgColor, resources.getColor(R.color.week_bg_color));
+        weekTextColor = typedArray.getColor(R.styleable.DatePickerView_topWeekTextColor, resources.getColor(R.color.week_text_color));
     }
 
     /**
@@ -63,19 +77,19 @@ public class SimpleMonthAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
      * @param day
      */
     public void setSelectedDate(int year, int month, int day) {
-        mDefaultSelectedYear = year;
-        mDefaultSelectedMonth = month;
-        mDefaultSelectedDay = day;
+        defaultSelectedYear = year;
+        defaultSelectedMonth = month;
+        defaultSelectedDay = day;
     }
 
-    public void setController(DatePickerController controller){
-        mController = controller;
+    public void setController(DatePickerController controller) {
+        this.controller = controller;
         init();
     }
 
     @Override
     public int getItemViewType(int position) {
-        if(position == 0){
+        if (position == 0) {
             return ITEM_TYPE_HEADER_WEEK;
         }
 
@@ -84,10 +98,10 @@ public class SimpleMonthAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        if(viewType == ITEM_TYPE_HEADER_WEEK){
+        if (viewType == ITEM_TYPE_HEADER_WEEK) {
             View headerView = LayoutInflater.from(mContext).inflate(R.layout.item_header_week, viewGroup, false);
             return new HeaderViewHolder(headerView);
-        }else {
+        } else {
             final SimpleMonthView simpleMonthView = new SimpleMonthView(mContext, typedArray);
             return new MonthViewHolder(simpleMonthView, this);
         }
@@ -95,12 +109,12 @@ public class SimpleMonthAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        if(viewHolder instanceof HeaderViewHolder){
+        if (viewHolder instanceof HeaderViewHolder) {
             ((HeaderViewHolder) viewHolder).init();
             return;
         }
 
-        final SimpleMonthView v = ((MonthViewHolder)viewHolder).simpleMonthView;
+        final SimpleMonthView v = ((MonthViewHolder) viewHolder).simpleMonthView;
         final HashMap<String, Integer> drawingParams = new HashMap<String, Integer>();
         int month;
         int year;
@@ -149,26 +163,35 @@ public class SimpleMonthAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public int getItemCount() {
         int itemCount = 1;//1表示最顶部的header
-        itemCount += mController.preMonths() > 0 ? mController.preMonths() : 0;
-        itemCount += mController.preMonths() > 0 ? mController.afterMonths() : 0;
+        itemCount += controller.preMonths() > 0 ? controller.preMonths() : 0;
+        itemCount += controller.preMonths() > 0 ? controller.afterMonths() : 0;
 
         return itemCount;
     }
 
-    public static class HeaderViewHolder extends RecyclerView.ViewHolder{
-        final ViewGroup mWeekHeaderView;
+    public class HeaderViewHolder extends RecyclerView.ViewHolder {
+        final LinearLayout mWeekHeaderView;
 
         HeaderViewHolder(View itemView) {
             super(itemView);
-            mWeekHeaderView = (ViewGroup) itemView;
+            mWeekHeaderView = (LinearLayout) itemView;
         }
 
-        public void init(){
-
+        public void init() {
+            mWeekHeaderView.getLayoutParams().height = weekHeight;
+            mWeekHeaderView.setBackgroundColor(weekBgColor);
+            int count = mWeekHeaderView.getChildCount();
+            for (int i = 0; i < count; i++) {
+                View child = mWeekHeaderView.getChildAt(i);
+                if (child instanceof TextView) {
+                    ((TextView) child).setTextColor(weekTextColor);
+                    ((TextView) child).setTextSize(TypedValue.COMPLEX_UNIT_PX, weekTextSize);
+                }
+            }
         }
     }
 
-    public static class MonthViewHolder extends RecyclerView.ViewHolder {
+    public class MonthViewHolder extends RecyclerView.ViewHolder {
         final SimpleMonthView simpleMonthView;
 
         public MonthViewHolder(View itemView, SimpleMonthView.OnDayClickListener onDayClickListener) {
@@ -184,7 +207,7 @@ public class SimpleMonthAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         //初始化最早的年月
         startYear = calendar.get(Calendar.YEAR);
         startMonth = calendar.get(Calendar.MONTH);
-        for (int i = 0; i < mController.preMonths(); i++) {
+        for (int i = 0; i < controller.preMonths(); i++) {
             --startMonth;
             if (startMonth < 0) {
                 --startYear;
@@ -195,14 +218,15 @@ public class SimpleMonthAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         selectWay = typedArray.getInt(R.styleable.DatePickerView_selectWay, 1);
 
         if (selectWay == 0) {
-            if (mDefaultSelectedYear != -1 && mDefaultSelectedMonth != -1 && mDefaultSelectedDay != -1) {
-                onDayTapped(new CalendarDay(mDefaultSelectedYear, mDefaultSelectedMonth, mDefaultSelectedDay));
+            if (defaultSelectedYear != -1 && defaultSelectedMonth != -1 && defaultSelectedDay != -1) {
+                onDayTapped(new CalendarDay(defaultSelectedYear, defaultSelectedMonth, defaultSelectedDay));
             } else if (typedArray.getBoolean(R.styleable.DatePickerView_currentDaySelected, false)) {
                 onDayTapped(new CalendarDay(System.currentTimeMillis()));
             }
         }
     }
 
+    @Override
     public void onDayClick(SimpleMonthView simpleMonthView, CalendarDay calendarDay) {
         if (calendarDay != null) {
             onDayTapped(calendarDay);
@@ -210,7 +234,8 @@ public class SimpleMonthAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     protected void onDayTapped(CalendarDay calendarDay) {
-        mController.onDayOfMonthSelected(calendarDay.year, calendarDay.month, calendarDay.day);
+        int weekIndex = CalendarUtils.dayToWeek(calendarDay.year, calendarDay.month, calendarDay.day);
+        controller.onDayOfMonthSelected(calendarDay.year, calendarDay.month, calendarDay.day, weekIndex);
         setSelectedDay(calendarDay);
     }
 
@@ -223,7 +248,7 @@ public class SimpleMonthAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     return;
                 }
                 selectedDays.setLast(calendarDay);
-                mController.onDateRangeSelected(selectedDays);
+                controller.onDateRangeSelected(selectedDays);
             } else if (selectedDays.getLast() != null) {
                 selectedDays.setFirst(calendarDay);
                 selectedDays.setLast(null);

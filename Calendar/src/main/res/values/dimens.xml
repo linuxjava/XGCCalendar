@@ -9,4 +9,7 @@
     <dimen name="calendar_height">350dip</dimen>
     <dimen name="rect_width">40dip</dimen>
     <dimen name="rect_height">45dip</dimen>
+
+    <dimen name="week_height">30dip</dimen>
+    <dimen name="week_text_size">12sp</dimen>
 </resources>
