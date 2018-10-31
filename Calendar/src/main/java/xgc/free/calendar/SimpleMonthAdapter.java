@@ -164,7 +164,7 @@ public class SimpleMonthAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public int getItemCount() {
         int itemCount = 1;//1表示最顶部的header
         itemCount += controller.preMonths() > 0 ? controller.preMonths() : 0;
-        itemCount += controller.preMonths() > 0 ? controller.afterMonths() : 0;
+        itemCount += controller.afterMonths() > 0 ? controller.afterMonths() : 0;
 
         return itemCount;
     }

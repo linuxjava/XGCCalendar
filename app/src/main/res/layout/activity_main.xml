@@ -22,7 +22,8 @@
         calendar:colorCurrentDay="#2A70FE"
         calendar:colorSelectedBetweenDayBackground="#AA2A70FE"
         calendar:currentDaySelected="true"
-        calendar:drawShape="circle"
+        calendar:drawShape="rect"
+        calendar:selectedDayRadius="5dp"
         calendar:enablePreviousDay="false"
         calendar:previousDayOffset="2"
         calendar:selectWay="multi" />

@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerControl
 
     @Override
     public int preMonths() {
-        return 1;
+        return 0;
     }
 
     @Override
