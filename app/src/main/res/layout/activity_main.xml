@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:calendar="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF5F5F5"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#ffffff"
+        android:gravity="center"
+        android:text="日期选择"
+        android:textColor="#4a4a4a"
+        android:textSize="17sp" />
+
+    <xgc.free.calendar.DatePickerView
+        android:id="@+id/pickerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        calendar:colorCurrentDay="#2A70FE"
+        calendar:colorSelectedBetweenDayBackground="#AA2A70FE"
+        calendar:currentDaySelected="true"
+        calendar:drawShape="rect"
+        calendar:enablePreviousDay="false"
+        calendar:previousDayOffset="2"
+        calendar:selectWay="multi" />
+
+</LinearLayout>

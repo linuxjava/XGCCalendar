@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="text_size_year_month">14sp</dimen>
+    <dimen name="text_size_solar_day">17sp</dimen>
+    <dimen name="text_size_lunar_day">10sp</dimen>
+    <dimen name="header_month_height">30dip</dimen>
+    <dimen name="header_padding_top">20dip</dimen>
+    <dimen name="header_padding_bottom">10dip</dimen>
+    <dimen name="calendar_height">350dip</dimen>
+    <dimen name="rect_width">40dip</dimen>
+    <dimen name="rect_height">45dip</dimen>
+</resources>

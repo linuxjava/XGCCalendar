@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="DatePickerView">
+        <!--**********************顶部星期属性**********************-->
+        <attr name="topWeekHeight" format="dimension" />
+        <attr name="topWeekBgColor" format="color" />
+        <attr name="topWeekTextColor" format="color" />
+        <attr name="topWeekTextSize" format="dimension" />
+
+        <!--**********************年月属性**********************-->
+        <!--年月的高度-->
+        <attr name="headerYearMonthHeight" format="dimension" />
+        <attr name="headerPaddingTop" format="dimension" />
+        <attr name="headerPaddingBottom" format="dimension" />
+        <!--年月颜色-->
+        <attr name="colorYearMonth" format="color" />
+        <!--年月文本大小-->
+        <attr name="textSizeYearMonth" format="dimension" />
+
+        <!--**********************日历属性**********************-->
+        <!--选择日期背景颜色-->
+        <attr name="colorSelectedDayBackground" format="color" />
+        <!--开始和结束之间日期的背景颜色-->
+        <attr name="colorSelectedBetweenDayBackground" format="color" />
+        <!--选择日期文本颜色-->
+        <attr name="colorSelectedDayText" format="color" />
+        <!--今天的颜色-->
+        <attr name="colorCurrentDay" format="color" />
+        <!--日期是周末时的text颜色-->
+        <attr name="colorWeekDay" format="color" />
+        <!--今天之前的颜色-->
+        <attr name="colorPreviousDay" format="color" />
+        <!--公历day颜色-->
+        <attr name="colorSolarDay" format="color" />
+        <!--农历day颜色-->
+        <attr name="colorLunarDay" format="color" />
+        <!--公历day大小-->
+        <attr name="textSizeSolarDay" format="dimension" />
+        <!--农历day大小-->
+        <attr name="textSizeLunarDay" format="dimension" />
+        <!--圆形背景半径或矩形背景圆角-->
+        <attr name="selectedDayRadius" format="dimension" />
+        <!--矩形背景宽度-->
+        <attr name="rectWidth" format="dimension" />
+        <!--矩形背景高度-->
+        <attr name="rectHeight" format="dimension" />
+        <!--日历一个月的高度-->
+        <attr name="calendarHeight" format="dimension" />
+        <!--使能过去日期-->
+        <attr name="enablePreviousDay" format="boolean" />
+        <attr name="previousDayOffset" format="integer" />
+        <!--是否默认选择当天-->
+        <attr name="currentDaySelected" format="boolean" />
+
+        <attr name="drawShape" format="enum">
+            <enum name="rect" value="0" />
+            <enum name="circle" value="1" />
+        </attr>
+        <attr name="selectWay" format="enum">
+            <!--单选-->
+            <enum name="ratio" value="0" />
+            <!--多选-->
+            <enum name="multi" value="1" />
+        </attr>
+    </declare-styleable>
+</resources>

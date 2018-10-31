@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--<color name="normal_day">#ff999999</color>-->
+    <color name="year_month">#9B9B9B</color>
+    <color name="solar_day">#000000</color>
+    <color name="lunar_day">#9B9B9B</color>
+    <color name="previous_day">#7f9B9B9B</color>
+    <color name="selected_day_text">#FFFFFF</color>
+    <color name="selected_day_background">#2A70FE</color>
+</resources>
