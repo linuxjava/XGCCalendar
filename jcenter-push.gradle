@@ -10,7 +10,7 @@ def desc = "Calendar for Android"//添加项目描述
 def repoStr = "XGCCalendar"//JCenter上仓储名
 
 group = 'xgc.free.calendar'// library name
-version = '0.1'// version
+version = '0.2'// version
 
 
 Properties properties = new Properties()
