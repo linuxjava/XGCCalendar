@@ -69,7 +69,7 @@ public interface DatePickerController {
 
 ### 整体说明
 ![image](https://github.com/linuxjava/XGCCalendar/raw/master/screenshot/1.png)
-
+![image](https://github.com/linuxjava/XGCCalendar/raw/master/screenshot/6.gif)
 整个日历分为2个大的部分：
 - 顶部红色框中是星期；
 - 绿色框中为一个月的日历；
