@@ -19,6 +19,7 @@
         android:id="@+id/pickerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:overScrollMode="never"
         calendar:colorCurrentDay="#2A70FE"
         calendar:colorSelectedBetweenDayBackground="#AA2A70FE"
         calendar:currentDaySelected="true"
