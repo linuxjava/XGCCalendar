@@ -18,9 +18,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerControl
         setContentView(R.layout.activity_main);
 
         dayPickerView = findViewById(R.id.pickerView);
+        //dayPickerView.setSelectedDate(2018, 11, 10);
         dayPickerView.setController(this);
-
-        //dayPickerView.scrollToPosition(5);
     }
 
     @Override

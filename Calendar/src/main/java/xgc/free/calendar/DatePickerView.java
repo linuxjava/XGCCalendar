@@ -1,40 +1,25 @@
-/***********************************************************************************
- * The MIT License (MIT)
- * Copyright (c) 2014 Robin Chutaux
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- ***********************************************************************************/
 package xgc.free.calendar;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
-import xgc.free.pinned.decoration.PinnedHeaderDecoration;
-
-public class DatePickerView extends RecyclerView {
-    protected Context mContext;
-    protected SimpleMonthAdapter mAdapter;
-    protected int mCurrentScrollState = 0;
-    protected long mPreviousScrollPosition;
-    protected int mPreviousScrollState = 0;
-    private TypedArray typedArray;
-    private OnScrollListener onScrollListener;
+public class DatePickerView extends LinearLayout {
+    private RecyclerView recyclerView;
+    private SimpleMonthAdapter adapter;
+    private LinearLayout weekHeaderView;
+    private int weekHeight;
+    private int weekBgColor;
+    private int weekTextColor;
+    private int weekTextSize;
 
     public DatePickerView(Context context) {
         this(context, null);
@@ -44,13 +29,39 @@ public class DatePickerView extends RecyclerView {
         this(context, attrs, 0);
     }
 
-    public DatePickerView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-        if (!isInEditMode()) {
-            typedArray = context.obtainStyledAttributes(attrs, R.styleable.DatePickerView);
-            setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-            init(context);
+    public DatePickerView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+
+        setOrientation(VERTICAL);
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.DatePickerView);
+        Resources resources = context.getResources();
+        weekHeight = typedArray.getDimensionPixelSize(R.styleable.DatePickerView_topWeekHeight, resources.getDimensionPixelSize(R.dimen.week_height));
+        weekTextSize = typedArray.getDimensionPixelSize(R.styleable.DatePickerView_topWeekTextSize, resources.getDimensionPixelSize(R.dimen.week_text_size));
+        weekBgColor = typedArray.getColor(R.styleable.DatePickerView_topWeekBgColor, resources.getColor(R.color.week_bg_color));
+        weekTextColor = typedArray.getColor(R.styleable.DatePickerView_topWeekTextColor, resources.getColor(R.color.week_text_color));
+
+
+        LayoutInflater.from(context).inflate(R.layout.calendar, this);
+
+        weekHeaderView = findViewById(R.id.header);
+        recyclerView = findViewById(R.id.calendar);
+
+        //设置星期文本属性
+        weekHeaderView.getLayoutParams().height = weekHeight;
+        weekHeaderView.setBackgroundColor(weekBgColor);
+        int count = weekHeaderView.getChildCount();
+        for (int i = 0; i < count; i++) {
+            View child = weekHeaderView.getChildAt(i);
+            if (child instanceof TextView) {
+                ((TextView) child).setTextColor(weekTextColor);
+                ((TextView) child).setTextSize(TypedValue.COMPLEX_UNIT_PX, weekTextSize);
+            }
         }
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        recyclerView.setVerticalScrollBarEnabled(false);
+        recyclerView.setFadingEdgeLength(0);
+        adapter = new SimpleMonthAdapter(context, typedArray);
     }
 
     /**
@@ -61,50 +72,35 @@ public class DatePickerView extends RecyclerView {
      * @param day
      */
     public DatePickerView setSelectedDate(int year, int month, int day) {
-        mAdapter.setSelectedDate(year, month, day);
+        adapter.setSelectedDate(year, month, day);
         return this;
     }
 
     public void setController(DatePickerController controller) {
-        mAdapter.setController(controller);
-        setAdapter(mAdapter);
-    }
+        adapter.setController(controller);
+        recyclerView.setAdapter(adapter);
 
-    private void init(Context paramContext) {
-        setLayoutManager(new LinearLayoutManager(paramContext));
-        mContext = paramContext;
-        setUpListView();
-        mAdapter = new SimpleMonthAdapter(paramContext, typedArray);
-        addItemDecoration(new PinnedHeaderDecoration().registerTypePinnedHeader(SimpleMonthAdapter.ITEM_TYPE_HEADER_WEEK,
-                new PinnedHeaderDecoration.PinnedHeaderCreator() {
-                    @Override
-                    public boolean create(RecyclerView parent, int adapterPosition) {
-                        return true;
+        if (adapter.getScrollPosition() >= 0 && adapter.getScrollPosition() < adapter.getItemCount()) {
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    if (recyclerView.getLayoutManager() != null && recyclerView.getLayoutManager() instanceof LinearLayoutManager) {
+                        ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(adapter.getScrollPosition(), 0);
                     }
-                }));
-
-        onScrollListener = new OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                final SimpleMonthView child = (SimpleMonthView) recyclerView.getChildAt(0);
-                if (child == null) {
-                    return;
                 }
-
-                mPreviousScrollPosition = dy;
-                mPreviousScrollState = mCurrentScrollState;
-            }
-        };
+            });
+        }
     }
 
-    protected void setUpListView() {
-        setVerticalScrollBarEnabled(false);
-        setOnScrollListener(onScrollListener);
-        setFadingEdgeLength(0);
-    }
-
+    /**
+     * 多选日期
+     *
+     * @return
+     */
     public SimpleMonthAdapter.SelectedDays<SimpleMonthAdapter.CalendarDay> getSelectedDays() {
-        return mAdapter.getSelectedDays();
+        if (adapter == null) {
+            return null;
+        }
+        return adapter.getSelectedDays();
     }
 }

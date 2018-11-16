@@ -38,9 +38,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 public class SimpleMonthAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements SimpleMonthView.OnDayClickListener {
-    protected static final int MONTHS_IN_YEAR = 12;
-    public static final int ITEM_TYPE_HEADER_WEEK = 0;
-    public static final int ITEM_TYPE_MONTH = 1;
+    private static final int MONTHS_IN_YEAR = 12;
     private final TypedArray typedArray;
     private final Context mContext;
     private DatePickerController controller;
@@ -51,22 +49,14 @@ public class SimpleMonthAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private int defaultSelectedYear = -1;
     private int defaultSelectedMonth = -1;
     private int defaultSelectedDay = -1;
-    private int weekHeight;
-    private int weekBgColor;
-    private int weekTextColor;
-    private int weekTextSize;
+
+    private int scrollPosition = -1;
 
     public SimpleMonthAdapter(Context context, TypedArray typedArray) {
         this.typedArray = typedArray;
         calendar = Calendar.getInstance();
         selectedDays = new SelectedDays<>();
         mContext = context;
-
-        Resources resources = context.getResources();
-        weekHeight = typedArray.getDimensionPixelSize(R.styleable.DatePickerView_topWeekHeight, resources.getDimensionPixelSize(R.dimen.week_height));
-        weekTextSize = typedArray.getDimensionPixelSize(R.styleable.DatePickerView_topWeekTextSize, resources.getDimensionPixelSize(R.dimen.week_text_size));
-        weekBgColor = typedArray.getColor(R.styleable.DatePickerView_topWeekBgColor, resources.getColor(R.color.week_bg_color));
-        weekTextColor = typedArray.getColor(R.styleable.DatePickerView_topWeekTextColor, resources.getColor(R.color.week_text_color));
     }
 
     /**
@@ -87,40 +77,25 @@ public class SimpleMonthAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         init();
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        if (position == 0) {
-            return ITEM_TYPE_HEADER_WEEK;
-        }
-
-        return ITEM_TYPE_MONTH;
+    public int getScrollPosition() {
+        return scrollPosition;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        if (viewType == ITEM_TYPE_HEADER_WEEK) {
-            View headerView = LayoutInflater.from(mContext).inflate(R.layout.item_header_week, viewGroup, false);
-            return new HeaderViewHolder(headerView);
-        } else {
-            final SimpleMonthView simpleMonthView = new SimpleMonthView(mContext, typedArray);
-            return new MonthViewHolder(simpleMonthView, this);
-        }
+        final SimpleMonthView simpleMonthView = new SimpleMonthView(mContext, typedArray);
+        return new MonthViewHolder(simpleMonthView, this);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        if (viewHolder instanceof HeaderViewHolder) {
-            ((HeaderViewHolder) viewHolder).init();
-            return;
-        }
-
         final SimpleMonthView v = ((MonthViewHolder) viewHolder).simpleMonthView;
         final HashMap<String, Integer> drawingParams = new HashMap<String, Integer>();
         int month;
         int year;
 
-        month = (startMonth + position - 1) % MONTHS_IN_YEAR;
-        year = startYear + (position - 1 + startMonth) / MONTHS_IN_YEAR;
+        month = (startMonth + position) % MONTHS_IN_YEAR;
+        year = startYear + (position + startMonth) / MONTHS_IN_YEAR;
 
         int selectedFirstDay = -1;
         int selectedLastDay = -1;
@@ -141,8 +116,6 @@ public class SimpleMonthAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             selectedLastYear = selectedDays.getLast().year;
         }
 
-        //v.reuse();//貌似没有作用
-
         drawingParams.put(SimpleMonthView.VIEW_PARAMS_SELECTED_BEGIN_YEAR, selectedFirstYear);
         drawingParams.put(SimpleMonthView.VIEW_PARAMS_SELECTED_LAST_YEAR, selectedLastYear);
         drawingParams.put(SimpleMonthView.VIEW_PARAMS_SELECTED_BEGIN_MONTH, selectedFirstMonth);
@@ -162,33 +135,11 @@ public class SimpleMonthAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public int getItemCount() {
-        int itemCount = 1;//1表示最顶部的header
+        int itemCount = 0;
         itemCount += controller.preMonths() > 0 ? controller.preMonths() : 0;
         itemCount += controller.afterMonths() > 0 ? controller.afterMonths() : 0;
 
         return itemCount;
-    }
-
-    public class HeaderViewHolder extends RecyclerView.ViewHolder {
-        final LinearLayout mWeekHeaderView;
-
-        HeaderViewHolder(View itemView) {
-            super(itemView);
-            mWeekHeaderView = (LinearLayout) itemView;
-        }
-
-        public void init() {
-            mWeekHeaderView.getLayoutParams().height = weekHeight;
-            mWeekHeaderView.setBackgroundColor(weekBgColor);
-            int count = mWeekHeaderView.getChildCount();
-            for (int i = 0; i < count; i++) {
-                View child = mWeekHeaderView.getChildAt(i);
-                if (child instanceof TextView) {
-                    ((TextView) child).setTextColor(weekTextColor);
-                    ((TextView) child).setTextSize(TypedValue.COMPLEX_UNIT_PX, weekTextSize);
-                }
-            }
-        }
     }
 
     public class MonthViewHolder extends RecyclerView.ViewHolder {
@@ -219,8 +170,10 @@ public class SimpleMonthAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         if (selectWay == 0) {
             if (defaultSelectedYear != -1 && defaultSelectedMonth != -1 && defaultSelectedDay != -1) {
+                scrollPosition = defaultSelectedYear * 12 + defaultSelectedMonth - (startYear * 12 + startMonth);
                 onDayTapped(new CalendarDay(defaultSelectedYear, defaultSelectedMonth, defaultSelectedDay));
             } else if (typedArray.getBoolean(R.styleable.DatePickerView_currentDaySelected, false)) {
+                scrollPosition = controller.preMonths();
                 onDayTapped(new CalendarDay(System.currentTimeMillis()));
             }
         }
