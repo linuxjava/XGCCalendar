@@ -43,8 +43,8 @@ public class DatePickerView extends LinearLayout {
 
         LayoutInflater.from(context).inflate(R.layout.calendar, this);
 
-        weekHeaderView = findViewById(R.id.header);
-        recyclerView = findViewById(R.id.calendar);
+        weekHeaderView = (LinearLayout) findViewById(R.id.header);
+        recyclerView = (RecyclerView) findViewById(R.id.calendar);
 
         //设置星期文本属性
         weekHeaderView.getLayoutParams().height = weekHeight;

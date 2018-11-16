@@ -12,7 +12,7 @@
 ## 使用
 ### 添加依赖
 ```xml
-implementation 'xgc.free.calendar:Calendar:1.0'
+implementation 'xgc.free.calendar:Calendar:1.1'
 ```
 ## 方法
 
